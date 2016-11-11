@@ -66,18 +66,19 @@ class TelegramManager():
         while True:
             try:
                 update = queue.get()
-                try:
-                    username = update['user']['name']
-                except KeyError:
-                    username = 'slacker'
+                #try:
+                #    username = update['user']['name']
+                #except KeyError:
+                #    username = 'slacker'
                 try:
                     channel = self.channel_matching[update['channel']]
                 except KeyError:
                     logging.error('unknown slack channel: %s ' % update['channel'])
                     continue
-                message = '*%s*\n%s' % (username, update['text'])
+                #message = '*%s*\n%s' % (username, update['text'])
                 self.bot.sendMessage(chat_id=channel,
-                                        text=message,
+                                        text=update['text'],
+                                        disable_web_page_preview=1,
                                         parse_mode="Markdown")
             except Exception, e:
                 logging.error(str(e))

@@ -1,6 +1,6 @@
 FROM python:2.7-alpine
 
-RUN apk add --no-cache bash 
+RUN apk add --no-cache bash nano
 
 RUN mkdir -p slack-telegram
 COPY . /slack-telegram

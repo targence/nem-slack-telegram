@@ -48,8 +48,8 @@ class SlackManager():
     def prep_message(self, update):
         try:
             #get user data
-            user = self._resolve_user(update['user'])
-            update['user'] = user  # user is a dict now
+            #user = self._resolve_user(update['user'])
+            #update['user'] = user  # user is a dict now
 
             #resolve mentionings
             marked_users = set([m.group(1) for m in
@@ -81,9 +81,9 @@ class SlackManager():
                         updates = self.bot.rtm_read()
                         for update in updates:
                             #print 'Received from slack', update
-                            if update.get('subtype') == 'bot_message':
-                                #msg from a bot - move on
-                                continue
+                            #if update.get('subtype') == 'bot_message':
+                            #    #msg from a bot - move on
+                            #    continue
                             if not update.get('text'):
                                 #no text = move on
                                 continue
