@@ -50,20 +50,27 @@ class SlackManager():
             #get user data
             #user = self._resolve_user(update['user'])
             #update['user'] = user  # user is a dict now
-
-            #resolve mentionings
-            marked_users = set([m.group(1) for m in
-                                            re.finditer('<@([A-Z0-9]+)>',
-                                                        update['text'])])
-            for marked_user in marked_users:
-                username = self._resolve_user(marked_user)['name']
-                update['text'] = update['text'].replace(marked_user,
-                                                        username)
-            #replace emos
-            update['text'] = self.replace_emos(update['text'])
-            #remove channel code from name
-            update['text'] = self.clean_channel_name(update['text'])
-            update['text'] = self.clean_html_entities(update['text'])
+            if update.get('text'):
+                #resolve mentionings
+                marked_users = set([m.group(1) for m in
+                                                re.finditer('<@([A-Z0-9]+)>',
+                                                            update['text'])])
+                for marked_user in marked_users:
+                    username = self._resolve_user(marked_user)['name']
+                    update['text'] = update['text'].replace(marked_user,
+                                                            username)
+                #replace emos
+                update['text'] = self.replace_emos(update['text'])
+                #remove channel code from name
+                update['text'] = self.clean_channel_name(update['text'])
+                update['text'] = self.clean_html_entities(update['text'])
+            else #for github ugly hotfix
+                #replace emos
+                update['text'] = self.replace_emos(update['attachments'][0]['fallback'])
+                #remove channel code from name
+                update['text'] = self.clean_channel_name(update['text'])
+                update['text'] = self.clean_html_entities(update['text'])                
+                
         except Exception, e:
             logging.error(str(e))
         return update
@@ -84,8 +91,8 @@ class SlackManager():
                             #if update.get('subtype') == 'bot_message':
                             #    #msg from a bot - move on
                             #    continue
-                            if not update.get('text'):
-                                #no text = move on
+                            if not update.get('text') and update['bot_id'] != 'B0CLE2VKP':
+                                #'B0CLE2VKP github
                                 continue
                             else:
                                 update = self.prep_message(update)
