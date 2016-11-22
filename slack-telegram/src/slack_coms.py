@@ -64,12 +64,15 @@ class SlackManager():
                 #remove channel code from name
                 update['text'] = self.clean_channel_name(update['text'])
                 update['text'] = self.clean_html_entities(update['text'])
-            else #for github ugly hotfix
+            else: #for github ugly hotfix
                 #replace emos
+                #import code; code.interact(local=dict(globals(), **locals()))
                 update['text'] = self.replace_emos(update['attachments'][0]['fallback'])
                 #remove channel code from name
                 update['text'] = self.clean_channel_name(update['text'])
                 update['text'] = self.clean_html_entities(update['text'])                
+                update['text'] = re.sub(r'\[\[','[{',update['text'])
+                update['text'] = re.sub(r'\]\]','}]',update['text'])
                 
         except Exception, e:
             logging.error(str(e))
@@ -87,17 +90,17 @@ class SlackManager():
                     try:
                         updates = self.bot.rtm_read()
                         for update in updates:
-                            #print 'Received from slack', update
-                            #if update.get('subtype') == 'bot_message':
-                            #    #msg from a bot - move on
-                            #    continue
-                            if not update.get('text') and update['bot_id'] != 'B0CLE2VKP':
-                                #'B0CLE2VKP github
-                                continue
+                            if not update.get('text'):
+                                if update.get('bot_id') and update['bot_id'] == 'B0CLE2VKP':
+                                    update = self.prep_message(update)
+                                    logging.debug('Queued: %s' % update)
+                                    queue.put(update) 
+                                else:                                   
+                                    continue
                             else:
                                 update = self.prep_message(update)
                                 logging.debug('Queued: %s' % update)
-                                queue.put(update)
+                                queue.put(update)                        
                             time.sleep(1)
                     except Exception, e:
                         logging.error(str(e))
